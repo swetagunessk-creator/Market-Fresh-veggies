@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swayke Fresh Market — From Farm to Table</title>
+    
+    <!-- Google Fonts: Inter & Playfair Display for warm organic branding -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        farm: {
+                            50: '#f4f9f4',
+                            100: '#e4f1e5',
+                            200: '#c9e3cc',
+                            600: '#2e6f40',
+                            700: '#235631',
+                            800: '#1b4326',
+                            900: '#13311b',
+                        },
+                        cream: {
+                            50: '#fdfbf7',
+                            100: '#f8f3e8',
+                            200: '#efe4ce',
+                        },
+                        gold: {
+                            400: '#e5b84b',
+                            500: '#d4a024',
+                            600: '#b38216',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- QRCode.js Library for dynamic scannable store QR code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        /* Smooth scrolling and high-readability base styles */
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            background-color: #fdfbf7;
+            color: #1c241e;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom subtle scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8f3e8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c9e3cc;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2e6f40;
+        }
+        /* Ensure QR code image centers cleanly inside its container */
+        #qrcode img, #qrcode canvas {
+            margin: 0 auto;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between pb-32 sm:pb-28">
+
+    <!-- Top Toast Notification Banner (Replaces alert()) -->
+    <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-11/12 max-w-md pointer-events-none transition-all duration-300 opacity-0 -translate-y-4">
+        <div id="toast-box" class="bg-farm-800 text-white px-5 py-3.5 rounded-2xl shadow-xl border border-farm-600 flex items-center gap-3 text-base font-medium">
+            <span id="toast-icon" class="text-xl">✅</span>
+            <span id="toast-message">Action completed!</span>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <header class="bg-farm-800 text-white shadow-md sticky top-0 z-30">
+        <div class="max-w-5xl mx-auto px-4 py-4 sm:py-5 flex flex-wrap items-center justify-between gap-3">
+            <!-- Brand Logo & Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-cream-100 flex items-center justify-center text-3xl shadow-inner border-2 border-gold-400 shrink-0">
+                    🥬
+                </div>
+                <div>
+                    <h1 class="font-serif text-2xl sm:text-3xl font-extrabold tracking-tight text-cream-50 leading-none">
+                        Swayke Fresh Market
+                    </h1>
+                    <p class="text-gold-400 text-sm sm:text-base font-medium mt-1 flex items-center gap-1.5">
+                        <span>🌱 From Farm to Table</span>
+                        <span class="hidden sm:inline text-farm-200">•</span>
+                        <span id="header-date" class="hidden sm:inline text-cream-100 text-xs sm:text-sm font-normal"></span>
+                    </p>
+                    <p class="text-cream-100 text-xs sm:text-sm mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                        <span>📍 <span id="header-address">School Lane, Midlands</span></span>
+                        <span class="text-farm-200">•</span>
+                        <span>📞 <span id="header-phone">5811 0852</span></span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Action Buttons: Store QR Code & Owner Mode Indicator -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="openQrModal()" class="bg-cream-100 hover:bg-white active:scale-95 text-farm-900 font-bold px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-sm transition flex items-center gap-2 text-sm sm:text-base border border-gold-400 cursor-pointer">
+                    <svg class="w-5 h-5 text-farm-700" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h6v6H3V3zm12 0h6v6h-6V3zM3 15h6v6H3v-6zm12 0h3v3h-3v-3zm3 3h3v3h-3v-3zm-3 3h3v3h-3v-3zm3-6h3v3h-3v-3z"/>
+                    </svg>
+                    <span>Shop QR</span>
+                </button>
+
+                <button id="header-owner-btn" onclick="handleOwnerButtonClick()" class="bg-farm-700 hover:bg-farm-600 active:scale-95 text-cream-50 font-semibold px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-2xl transition flex items-center gap-2 text-sm sm:text-base border border-farm-600 cursor-pointer">
+                    <span id="owner-btn-icon">🔒</span>
+                    <span id="owner-btn-text">Owner</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Owner Mode Active Banner -->
+        <div id="owner-banner" class="hidden bg-gold-500 text-farm-900 px-4 py-2.5 text-center font-bold text-sm sm:text-base shadow-inner">
+            <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-2">
+                <span>🛠️ OWNER MODE ACTIVE — Update today's prices & share easily.</span>
+                <div class="flex flex-wrap items-center gap-2 mx-auto sm:mx-0">
+                    <button onclick="downloadUpdatedHtmlFile()" class="bg-farm-800 text-cream-50 border border-farm-900 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold hover:bg-farm-900 shadow-xs cursor-pointer">
+                        💾 Export index.html
+                    </button>
+                    <button onclick="downloadPriceListPoster()" class="bg-white text-farm-900 border border-farm-800 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold hover:bg-cream-100 shadow-xs cursor-pointer">
+                        🖼️ Save Price List Poster
+                    </button>
+                    <button onclick="sharePriceListWhatsApp()" class="bg-[#25D366] text-white px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold hover:bg-[#1ebe5d] shadow-xs cursor-pointer">
+                        📲 Share Text on WhatsApp
+                    </button>
+                    <button onclick="openSettingsModal()" class="bg-farm-900 text-white px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-farm-800 cursor-pointer">
+                        ⚙️ Settings
+                    </button>
+                    <button onclick="logoutOwner()" class="bg-white/90 text-farm-900 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-white cursor-pointer">
+                        Exit Owner
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-5xl w-full mx-auto px-4 pt-6 flex-grow">
+
+        <!-- Friendly Welcome & Simple 3-Step Guide for All Ages -->
+        <section id="customer-guide" class="bg-cream-100 border-2 border-cream-200 rounded-3xl p-4 sm:p-6 mb-6 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-farm-900">Fresh Harvest Today 🧺</h2>
+                    <p class="text-base sm:text-lg text-gray-700 mt-1">
+                        1. Tap <strong class="text-farm-700">+ Add</strong> on the vegetables you want &nbsp;•&nbsp; 
+                        2. Tap <strong class="text-green-700">Order via WhatsApp</strong> below!
+                    </p>
+                </div>
+                <!-- Simple Search & Filter -->
+                <div class="w-full sm:w-64 shrink-0">
+                    <label for="search-input" class="sr-only">Search vegetables</label>
+                    <div class="relative">
+                        <input type="text" id="search-input" oninput="renderProducts()" placeholder="🔍 Search vegetable..." 
+                            class="w-full bg-white border-2 border-farm-200 focus:border-farm-600 focus:outline-none rounded-2xl px-4 py-3 text-base sm:text-lg text-gray-900 placeholder-gray-500 shadow-sm">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Owner Add New Vegetable Panel (Visible ONLY in Owner Mode) -->
+        <section id="owner-add-panel" class="hidden bg-farm-50 border-2 border-farm-600 rounded-3xl p-5 sm:p-6 mb-8 shadow-md">
+            <h3 class="text-xl font-bold text-farm-900 mb-4 flex items-center gap-2">
+                <span>➕ Add New Vegetable / Item</span>
+            </h3>
+            <form id="add-item-form" onsubmit="handleAddNewItem(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4">
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Icon / Emoji</label>
+                    <input type="text" id="new-emoji" value="🥬" maxlength="4" required
+                        class="w-full bg-white border-2 border-gray-300 focus:border-farm-600 rounded-2xl px-3 py-3 text-center text-2xl">
+                </div>
+                <div class="sm:col-span-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Vegetable Name</label>
+                    <input type="text" id="new-name" placeholder="e.g. Chouchou" required
+                        class="w-full bg-white border-2 border-gray-300 focus:border-farm-600 rounded-2xl px-4 py-3 text-base font-medium">
+                </div>
+                <div class="sm:col-span-3">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Price (Rs)</label>
+                    <input type="number" id="new-price" placeholder="e.g. 45" min="1" step="0.5" required
+                        class="w-full bg-white border-2 border-gray-300 focus:border-farm-600 rounded-2xl px-4 py-3 text-base font-bold">
+                </div>
+                <div class="sm:col-span-3">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Sold By (Unit)</label>
+                    <select id="new-unit" class="w-full bg-white border-2 border-gray-300 focus:border-farm-600 rounded-2xl px-3 py-3 text-base font-semibold">
+                        <option value="per kg">per kg</option>
+                        <option value="per 500g">per 500g</option>
+                        <option value="per 250g">per 250g</option>
+                        <option value="per g">per g (100g step)</option>
+                        <option value="per bunch">per bunch</option>
+                        <option value="per piece">per piece</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-12 flex justify-end mt-1">
+                    <button type="submit" class="w-full sm:w-auto bg-farm-700 hover:bg-farm-800 text-white font-bold text-base px-6 py-3.5 rounded-2xl shadow-md transition cursor-pointer">
+                        + Add to Today's Market
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Product Grid -->
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <!-- Product cards injected dynamically via JavaScript -->
+        </div>
+
+        <!-- Empty Search State -->
+        <div id="empty-state" class="hidden text-center py-12 bg-white rounded-3xl border-2 border-cream-200 my-4">
+            <div class="text-5xl mb-3">🥕</div>
+            <h3 class="text-xl font-bold text-gray-800">No vegetables found</h3>
+            <p class="text-gray-600 mt-1">Try clearing your search box to see all fresh items.</p>
+            <button onclick="document.getElementById('search-input').value=''; renderProducts();" class="mt-4 bg-farm-700 text-white font-bold px-5 py-2.5 rounded-2xl cursor-pointer">
+                Show All Vegetables
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer with Subtle Owner Access -->
+    <footer class="max-w-5xl w-full mx-auto px-4 mt-12 pt-6 border-t border-cream-200 text-center text-gray-600 text-sm">
+        <p class="font-semibold text-farm-900 text-base">Swayke Fresh Market — Fresh Local Produce</p>
+        <p class="mt-1 font-medium text-gray-700">📍 <span id="footer-address">School Lane, Midlands</span> &nbsp;•&nbsp; WhatsApp: <span id="footer-phone">5811 0852</span></p>
+        <p class="mt-1">Prices updated daily. Order easily on WhatsApp for pickup or delivery (delivery fee applies).</p>
+        <div class="mt-4 flex items-center justify-center gap-4">
+            <button onclick="openQrModal()" class="text-farm-700 underline font-semibold hover:text-farm-900 cursor-pointer">
+                View Store QR Code
+            </button>
+            <span>•</span>
+            <button onclick="handleOwnerButtonClick()" class="text-gray-500 underline hover:text-farm-800 cursor-pointer">
+                Owner Login / Update Prices
+            </button>
+        </div>
+    </footer>
+
+    <!-- Sticky Bottom Basket Bar (Customer View) -->
+    <div id="sticky-basket-bar" class="fixed bottom-0 inset-x-0 bg-white border-t-2 border-farm-600 shadow-[0_-8px_25px_rgba(0,0,0,0.12)] z-30 transition-transform duration-300">
+        <div class="max-w-5xl mx-auto px-4 py-3 sm:py-4 flex items-center justify-between gap-3">
+            <!-- Basket Summary Info -->
+            <button onclick="openCheckoutModal()" class="flex items-center gap-3 text-left cursor-pointer group">
+                <div class="relative bg-farm-100 text-farm-800 p-3 rounded-2xl border border-farm-200 group-hover:bg-farm-200 transition">
+                    <span class="text-2xl sm:text-3xl">🧺</span>
+                    <span id="basket-count-badge" class="absolute -top-2 -right-2 bg-gold-500 text-farm-900 font-extrabold text-xs sm:text-sm w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center shadow">
+                        0
+                    </span>
+                </div>
+                <div>
+                    <div class="text-xs sm:text-sm font-bold uppercase tracking-wider text-gray-500">Your Basket</div>
+                    <div class="text-xl sm:text-2xl font-extrabold text-farm-900">
+                        Rs <span id="basket-total-amount">0</span>
+                    </div>
+                </div>
+            </button>
+
+            <!-- Big Prominent WhatsApp Order Button -->
+            <button onclick="openCheckoutModal()" class="bg-[#25D366] hover:bg-[#1ebe5d] active:scale-95 text-white font-extrabold text-base sm:text-lg px-5 py-3.5 sm:px-7 sm:py-4 rounded-2xl shadow-lg transition flex items-center gap-2.5 cursor-pointer">
+                <svg class="w-6 h-6 sm:w-7 sm:h-7 fill-current shrink-0" viewBox="0 0 24 24">
+                    <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824z"/>
+                </svg>
+                <span>Order via WhatsApp</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 1: WHATSAPP ORDER REVIEW & CHECKOUT                             -->
+    <!-- ===================================================================== -->
+    <div id="checkout-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-cream-50 w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl border-2 border-farm-200 max-h-[90vh] flex flex-col overflow-hidden">
+            <!-- Modal Header -->
+            <div class="bg-farm-800 text-white px-6 py-4 flex items-center justify-between">
+                <h3 class="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                    <span>🧺 Review Your Order</span>
+                </h3>
+                <button onclick="closeModal('checkout-modal')" class="w-10 h-10 rounded-full bg-farm-700 hover:bg-farm-600 text-white text-xl font-bold flex items-center justify-center cursor-pointer">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-5 sm:p-6 overflow-y-auto space-y-5 flex-grow">
+                <!-- Itemized List -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-bold uppercase tracking-wide text-gray-500">Selected Vegetables</span>
+                        <button onclick="clearBasket()" class="text-sm text-red-600 font-semibold hover:underline cursor-pointer">
+                            Clear All
+                        </button>
+                    </div>
+                    <div id="checkout-items-list" class="space-y-2.5">
+                        <!-- Items injected here -->
+                    </div>
+                </div>
+
+                <!-- Total Box -->
+                <div class="bg-farm-100 border-2 border-farm-600 rounded-2xl p-4 space-y-2">
+                    <div class="flex items-center justify-between text-base font-semibold text-gray-700">
+                        <span>Vegetables Subtotal:</span>
+                        <span>Rs <span id="checkout-subtotal">0</span></span>
+                    </div>
+                    <div id="checkout-delivery-row" class="hidden flex items-center justify-between text-base font-bold text-amber-800 bg-amber-100/80 px-3 py-1.5 rounded-xl border border-amber-300">
+                        <span>🚚 Delivery Fee Applies:</span>
+                        <span id="checkout-delivery-fee-display">Rs 50</span>
+                    </div>
+                    <div class="pt-2 border-t border-farm-200 flex items-center justify-between">
+                        <span class="text-lg font-bold text-farm-900">Estimated Total:</span>
+                        <span class="text-2xl sm:text-3xl font-extrabold text-farm-800">Rs <span id="checkout-total">0</span></span>
+                    </div>
+                </div>
+
+                <!-- Simple Customer Details -->
+                <div class="space-y-4 pt-2 border-t border-cream-200">
+                    <div>
+                        <label for="customer-name" class="block text-base font-bold text-gray-800 mb-1">
+                            Your Name <span class="text-gray-500 font-normal">(Optional)</span>
+                        </label>
+                        <input type="text" id="customer-name" placeholder="e.g. Mrs. Devi / Jean" 
+                            class="w-full bg-white border-2 border-gray-300 focus:border-farm-600 rounded-2xl px-4 py-3 text-lg">
+                    </div>
+
+                    <div>
+                        <label class="block text-base font-bold text-gray-800 mb-1.5">How would you like your order?</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="order-type" value="Pickup at School Lane, Midlands" checked onchange="handleOrderTypeChange()" class="peer sr-only">
+                                <div class="text-center py-3 px-2.5 rounded-2xl border-2 border-gray-300 bg-white font-bold text-sm sm:text-base peer-checked:border-farm-600 peer-checked:bg-farm-50 peer-checked:text-farm-800 transition h-full flex flex-col justify-center">
+                                    <span>🏪 Store Pickup</span>
+                                    <span class="text-xs font-semibold text-farm-700 mt-0.5">Free • School Lane, Midlands</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="order-type" value="Home Delivery" onchange="handleOrderTypeChange()" class="peer sr-only">
+                                <div class="text-center py-3 px-2.5 rounded-2xl border-2 border-gray-300 bg-white font-bold text-sm sm:text-base peer-checked:border-farm-600 peer-checked:bg-farm-50 peer-checked:text-farm-800 transition h-full flex flex-col justify-center">
+                                    <span>🚚 Home Delivery</span>
+                                    <span class="text-xs font-semibold text-amber-700 mt-0.5">Delivery fee applies</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label id="customer-note-label" for="customer-note" class="block text-base font-bold text-gray-800 mb-1">
+                            Pickup Time or Note <span class="text-gray-500 font-normal">(Optional)</span>
+                        </label>
+                        <textarea id="customer-note" rows="2" placeholder="e.g. Pickup at 4pm at School Lane, Midlands..."
+                            class="w-full bg-white border-2 border-gray-300 focus:border-farm-600 rounded-2xl px-4 py-2.5 text-base"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer Action -->
+            <div class="p-4 sm:p-5 bg-white border-t border-gray-200">
+                <button onclick="sendWhatsAppOrder()" class="w-full bg-[#25D366] hover:bg-[#1ebe5d] active:scale-98 text-white font-extrabold text-lg sm:text-xl py-4 rounded-2xl shadow-lg transition flex items-center justify-center gap-3 cursor-pointer">
+                    <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+                        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824z"/>
+                    </svg>
+                    <span>Send Order on WhatsApp</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 2: STORE QR CODE (FOR EASY CUSTOMER SCANNING & SHARING)         -->
+    <!-- ===================================================================== -->
+    <div id="qr-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden flex items-center justify-center p-4">
+        <div class="bg-cream-50 w-full max-w-md rounded-3xl shadow-2xl border-2 border-gold-400 overflow-hidden text-center">
+            <div class="bg-farm-800 text-white px-6 py-4 flex items-center justify-between">
+                <h3 class="text-xl font-bold">📱 Scan to Order Vegetables</h3>
+                <button onclick="closeModal('qr-modal')" class="w-9 h-9 rounded-full bg-farm-700 hover:bg-farm-600 text-white font-bold flex items-center justify-center cursor-pointer">
+                    ✕
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <p id="qr-modal-subtitle" class="text-gray-700 text-base font-medium">
+                    Point your phone camera at this QR code to open <strong>WhatsApp</strong> and order directly from <strong>Swayke Fresh Market</strong>!
+                </p>
+
+                <!-- QR Mode Toggle: Direct WhatsApp Chat (Works Offline) vs Website Link -->
+                <div class="grid grid-cols-2 gap-2 bg-cream-100 p-1.5 rounded-2xl border border-cream-200">
+                    <button type="button" id="qr-mode-whatsapp-btn" onclick="setQrMode('whatsapp')"
+                        class="py-2 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition cursor-pointer bg-farm-700 text-white shadow-xs">
+                        💬 Direct WhatsApp QR
+                    </button>
+                    <button type="button" id="qr-mode-web-btn" onclick="setQrMode('web')"
+                        class="py-2 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition cursor-pointer text-gray-700 hover:bg-white/70">
+                        🌐 Website Link QR
+                    </button>
+                </div>
+
+                <!-- Printable / Downloadable Store Poster Card -->
+                <div class="bg-white p-5 rounded-3xl border-2 border-farm-600 shadow-md max-w-xs mx-auto space-y-2.5">
+                    <div class="text-xs font-extrabold uppercase tracking-widest text-farm-700">🌱 From Farm to Table</div>
+                    <div class="font-serif text-xl font-extrabold text-farm-900 leading-tight">Swayke Fresh Market</div>
+                    <div id="qrcode" class="flex justify-center py-1"></div>
+                    <div id="qr-card-badge" class="inline-block bg-green-100 text-green-900 font-extrabold text-xs px-3 py-1 rounded-full">
+                        📲 Scan to Order on WhatsApp
+                    </div>
+                    <div class="pt-2 border-t border-cream-200 text-xs sm:text-sm text-gray-800 space-y-0.5">
+                        <div class="font-bold">📍 <span id="qr-card-address">School Lane, Midlands</span></div>
+                        <div class="font-extrabold text-farm-700">WhatsApp: <span id="qr-card-phone">5811 0852</span></div>
+                    </div>
+                </div>
+
+                <!-- Encoded Link Display & Copy -->
+                <div class="text-left bg-cream-100 p-3.5 rounded-2xl border border-cream-200">
+                    <label id="qr-url-label" for="qr-url-input" class="block text-xs font-bold uppercase text-gray-600 mb-1">Direct WhatsApp Order Link (No Website Needed)</label>
+                    <div class="flex gap-2">
+                        <input type="url" id="qr-url-input" oninput="regenerateQrCode()" 
+                            class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-sm text-gray-800">
+                        <button onclick="copyStoreLink()" class="bg-farm-700 hover:bg-farm-800 text-white font-bold px-3.5 py-2 rounded-xl text-sm shrink-0 cursor-pointer">
+                            Copy
+                        </button>
+                    </div>
+                    <p id="whatsapp-qr-tip" class="text-xs text-farm-900 bg-farm-50 border border-farm-200 rounded-xl p-2 mt-2 font-medium">
+                        ✅ <strong>Works immediately!</strong> Customers scan this QR code and WhatsApp opens directly to <strong>5811 0852</strong> with an order template—zero hosting needed.
+                    </p>
+                    <p id="local-file-warning" class="hidden text-xs text-amber-800 bg-amber-100 border border-amber-300 rounded-xl p-2 mt-2 font-medium">
+                        ⚠️ <strong>Note:</strong> You are currently opening this file from your computer (<code>file://</code>). Switch to <strong>💬 Direct WhatsApp QR</strong> above if you don't plan to host a website!
+                    </p>
+                </div>
+
+                <div class="flex gap-3 pt-1">
+                    <button onclick="downloadQrCode()" class="flex-1 bg-gold-500 hover:bg-gold-600 text-farm-900 font-extrabold py-3 rounded-2xl shadow transition cursor-pointer">
+                        ⬇️ Save QR Poster
+                    </button>
+                    <button onclick="closeModal('qr-modal')" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-2xl transition cursor-pointer">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 3: OWNER LOGIN MODAL (PIN PROTECTION)                           -->
+    <!-- ===================================================================== -->
+    <div id="login-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl border-2 border-farm-700 overflow-hidden">
+            <div class="bg-farm-800 text-white px-6 py-4 flex items-center justify-between">
+                <h3 class="text-xl font-bold">🔒 Owner Access</h3>
+                <button onclick="closeModal('login-modal')" class="w-9 h-9 rounded-full bg-farm-700 hover:bg-farm-600 text-white font-bold flex items-center justify-center cursor-pointer">
+                    ✕
+                </button>
+            </div>
+            <form onsubmit="verifyOwnerPin(event)" class="p-6 space-y-4">
+                <p class="text-gray-700 text-base">
+                    Enter your <strong>Owner PIN</strong> to update daily vegetable prices, units, and stock availability.
+                </p>
+                <div>
+                    <label for="owner-pin-input" class="block text-sm font-bold text-gray-700 mb-1">Owner PIN</label>
+                    <input type="password" id="owner-pin-input" inputmode="numeric" placeholder="••••" required
+                        class="w-full bg-cream-50 border-2 border-gray-300 focus:border-farm-600 rounded-2xl px-4 py-3.5 text-center text-2xl tracking-widest font-extrabold">
+                    <p id="login-error" class="hidden text-red-600 text-sm font-bold mt-2 text-center">
+                        ❌ Incorrect PIN. Please try again.
+                    </p>
+                </div>
+
+                <!-- Helpful note for first-time setup -->
+                <div class="bg-farm-50 border border-farm-200 rounded-xl p-3 text-xs text-farm-900">
+                    <strong>First-time default PIN:</strong> <code class="bg-white px-1.5 py-0.5 rounded border font-bold">1234</code><br>
+                    You can change this PIN anytime inside Store Settings once logged in.
+                </div>
+
+                <button type="submit" class="w-full bg-farm-700 hover:bg-farm-800 text-white font-extrabold text-lg py-3.5 rounded-2xl shadow-md transition cursor-pointer">
+                    Unlock Price Editor
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 4: OWNER STORE SETTINGS (WHATSAPP NUMBER, PIN, GOOGLE SHEET)    -->
+    <!-- ===================================================================== -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border-2 border-farm-700 overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="bg-farm-800 text-white px-6 py-4 flex items-center justify-between">
+                <h3 class="text-xl font-bold">⚙️ Store Owner Settings</h3>
+                <button onclick="closeModal('settings-modal')" class="w-9 h-9 rounded-full bg-farm-700 hover:bg-farm-600 text-white font-bold flex items-center justify-center cursor-pointer">
+                    ✕
+                </button>
+            </div>
+            <form onsubmit="saveStoreSettings(event)" class="p-6 space-y-4 overflow-y-auto">
+                <div>
+                    <label for="setting-whatsapp" class="block text-sm font-bold text-gray-800 mb-1">
+                        Store WhatsApp Number (with Country Code)
+                    </label>
+                    <input type="text" id="setting-whatsapp" placeholder="e.g. 23058110852" required
+                        class="w-full bg-cream-50 border-2 border-gray-300 focus:border-farm-600 rounded-2xl px-4 py-3 text-lg font-bold">
+                    <p class="text-xs text-gray-500 mt-1">Mauritius format: <strong>230</strong> followed by your 8-digit number (e.g. <code>23058110852</code>).</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label for="setting-address" class="block text-sm font-bold text-gray-800 mb-1">
+                            Store Pickup Address
+                        </label>
+                        <input type="text" id="setting-address" placeholder="School Lane, Midlands" required
+                            class="w-full bg-cream-50 border-2 border-gray-300 focus:border-farm-600 rounded-2xl px-4 py-3 text-base font-bold">
+                    </div>
+
+                    <div>
+                        <label for="setting-delivery-fee" class="block text-sm font-bold text-gray-800 mb-1">
+                            Delivery Fee (Rs)
+                        </label>
+                        <input type="number" id="setting-delivery-fee" min="0" step="5" placeholder="e.g. 50" required
+                            class="w-full bg-cream-50 border-2 border-gray-300 focus:border-farm-600 rounded-2xl px-4 py-3 text-lg font-bold">
+                        <p class="text-xs text-gray-500 mt-1">Set to <strong>0</strong> if delivery fee varies by area.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="setting-pin" class="block text-sm font-bold text-gray-800 mb-1">
+                        Change Owner PIN
+                    </label>
+                    <input type="text" id="setting-pin" inputmode="numeric" minlength="4" maxlength="10" required
+                        class="w-full bg-cream-50 border-2 border-gray-300 focus:border-farm-600 rounded-2xl px-4 py-3 text-lg font-bold">
+                </div>
+
+                <div class="pt-2 border-t border-gray-200">
+                    <label for="setting-csv-url" class="block text-sm font-bold text-gray-800 mb-1">
+                        Live Google Sheet CSV Link <span class="text-gray-500 font-normal">(Optional for Multi-Device Sync)</span>
+                    </label>
+                    <input type="url" id="setting-csv-url" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv"
+                        class="w-full bg-cream-50 border-2 border-gray-300 focus:border-farm-600 rounded-2xl px-4 py-2.5 text-sm">
+                    <p class="text-xs text-gray-600 mt-1.5 leading-relaxed">
+                        <strong>Tip:</strong> All edits made on this device save automatically. If you host this page online for customers to scan via QR code, paste a published Google Sheet CSV link here (columns: <code>name, price, unit, emoji, inStock</code>) so customers always see your live daily prices!
+                    </p>
+                </div>
+
+                <div class="pt-3 flex flex-wrap gap-3 justify-between items-center border-t border-gray-200">
+                    <button type="button" onclick="resetDefaultCatalog()" class="text-sm text-red-600 font-semibold hover:underline cursor-pointer">
+                        Reset Default Mauritian Items
+                    </button>
+                    <button type="submit" class="bg-farm-700 hover:bg-farm-800 text-white font-extrabold px-6 py-3 rounded-2xl shadow transition cursor-pointer">
+                        Save Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- APPLICATION LOGIC (STATE, LOCALSTORAGE, WHATSAPP, QR, OWNER ADMIN)    -->
+    <!-- ===================================================================== -->
+    <script>
+        // 1. DEFAULT MAURITIAN FRESH MARKET CATALOG
+        const DEFAULT_PRODUCTS = [
+            { id: 'veg-1', name: 'Lettuce Mignonette', price: 35, unit: 'per piece', emoji: '🥬', inStock: true },
+            { id: 'veg-2', name: 'Lettuce Grand Rapids', price: 40, unit: 'per piece', emoji: '🥗', inStock: true },
+            { id: 'veg-3', name: "Queue d'oignon", price: 20, unit: 'per bunch', emoji: '🧅', inStock: true },
+            { id: 'veg-4', name: 'Basilic (Fresh Basil)', price: 25, unit: 'per bunch', emoji: '🌿', inStock: true },
+            { id: 'veg-5', name: 'Chou Violet (Red Cabbage)', price: 65, unit: 'per kg', emoji: '🟣', inStock: true },
+            { id: 'veg-6', name: 'Piment Cari', price: 80, unit: 'per 500g', emoji: '🌶️', inStock: true },
+            { id: 'veg-7', name: 'Piment Cabri', price: 30, unit: 'per 250g', emoji: '🔥', inStock: true },
+            { id: 'veg-8', name: 'Ginger (Gingembre)', price: 110, unit: 'per kg', emoji: '🫚', inStock: true },
+            { id: 'veg-9', name: 'Thyme (Thym)', price: 15, unit: 'per bunch', emoji: '🌱', inStock: true },
+            { id: 'veg-10', name: 'Brède Tompouce', price: 25, unit: 'per bunch', emoji: '🍃', inStock: true },
+            { id: 'veg-11', name: 'Tomatoes (Pomme d’Amour)', price: 75, unit: 'per kg', emoji: '🍅', inStock: true },
+            { id: 'veg-12', name: 'Potatoes (Pomme de Terre)', price: 45, unit: 'per kg', emoji: '🥔', inStock: true }
+        ];
+
+        const STORAGE_KEYS = {
+            PRODUCTS: 'swayke_market_products_v1',
+            SETTINGS: 'swayke_market_settings_v1',
+            BASKET: 'swayke_market_basket_v1'
+        };
+
+        // Application State
+        let state = {
+            products: [],
+            basket: {}, // { productId: quantityMultiplier }
+            isOwner: false,
+            settings: {
+                whatsappNumber: '23058110852',
+                storeAddress: 'School Lane, Midlands',
+                deliveryFee: 50,
+                ownerPin: '1234',
+                googleSheetCsvUrl: ''
+            }
+        };
+
+        let qrCodeInstance = null;
+        let currentQrMode = 'whatsapp'; // 'whatsapp' (no website needed) or 'web'
+
+        // 2. INITIALIZATION ON LOAD
+        window.onload = async function () {
+            displayTodayDate();
+            loadFromLocalStorage();
+            updateStoreInfoDisplays();
+            
+            // If Owner configured a live Google Sheet CSV URL, fetch latest prices
+            if (state.settings.googleSheetCsvUrl) {
+                await fetchProductsFromGoogleSheet(state.settings.googleSheetCsvUrl);
+            }
+
+            renderProducts();
+            updateBasketUI();
+        };
+
+        function formatDisplayPhone(rawPhone) {
+            const digits = String(rawPhone || '').replace(/\D/g, '');
+            if (digits.startsWith('230') && digits.length === 11) {
+                const local = digits.slice(3);
+                return `${local.slice(0, 4)} ${local.slice(4)}`;
+            }
+            return rawPhone || '5811 0852';
+        }
+
+        function updateStoreInfoDisplays() {
+            const displayPhone = formatDisplayPhone(state.settings.whatsappNumber);
+            const address = state.settings.storeAddress || 'School Lane, Midlands';
+
+            const headerAddr = document.getElementById('header-address');
+            const headerPhone = document.getElementById('header-phone');
+            const footerAddr = document.getElementById('footer-address');
+            const footerPhone = document.getElementById('footer-phone');
+            const qrAddr = document.getElementById('qr-card-address');
+            const qrPhone = document.getElementById('qr-card-phone');
+
+            if (headerAddr) headerAddr.textContent = address;
+            if (headerPhone) headerPhone.textContent = displayPhone;
+            if (footerAddr) footerAddr.textContent = address;
+            if (footerPhone) footerPhone.textContent = displayPhone;
+            if (qrAddr) qrAddr.textContent = address;
+            if (qrPhone) qrPhone.textContent = displayPhone;
+        }
+
+        function displayTodayDate() {
+            const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+            document.getElementById('header-date').textContent = new Date().toLocaleDateString('en-GB', options);
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const savedProducts = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
+                const savedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+                const savedBasket = localStorage.getItem(STORAGE_KEYS.BASKET);
+
+                state.products = savedProducts ? JSON.parse(savedProducts) : [...DEFAULT_PRODUCTS];
+                if (savedSettings) {
+                    state.settings = { ...state.settings, ...JSON.parse(savedSettings) };
+                }
+                if (savedBasket) {
+                    state.basket = JSON.parse(savedBasket);
+                }
+            } catch (e) {
+                console.error('Error loading saved data:', e);
+                state.products = [...DEFAULT_PRODUCTS];
+            }
+        }
+
+        function saveProductsToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(state.products));
+            } catch (e) {
+                console.error('Error saving products:', e);
+            }
+        }
+
+        function saveBasketToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEYS.BASKET, JSON.stringify(state.basket));
+            } catch (e) {
+                console.error('Error saving basket:', e);
+            }
+        }
+
+        // Optional Live Sync from Google Sheets CSV
+        async function fetchProductsFromGoogleSheet(csvUrl) {
+            try {
+                const response = await fetch(csvUrl);
+                if (!response.ok) return;
+                const text = await response.text();
+                const rows = text.split('\n').map(r => r.trim()).filter(Boolean);
+                if (rows.length < 2) return;
+
+                const parsed = [];
+                // Skip header row (index 0)
+                for (let i = 1; i < rows.length; i++) {
+                    const cols = rows[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+                    if (cols[0] && !isNaN(parseFloat(cols[1]))) {
+                        parsed.push({
+                            id: 'sheet-' + i,
+                            name: cols[0],
+                            price: parseFloat(cols[1]),
+                            unit: cols[2] || 'per kg',
+                            emoji: cols[3] || '🥬',
+                            inStock: cols[4] ? cols[4].toLowerCase() !== 'false' && cols[4].toLowerCase() !== 'no' : true
+                        });
+                    }
+                }
+                if (parsed.length > 0) {
+                    state.products = parsed;
+                    saveProductsToStorage();
+                }
+            } catch (err) {
+                console.warn('Could not sync Google Sheet CSV, using local data.', err);
+            }
+        }
+
+        // 3. SMART QUANTITY STEP HELPER
+        // Makes ordering intuitive for every unit (e.g., 0.5 kg steps, 100g steps, 1 bunch/piece)
+        function getUnitConfig(unit) {
+            switch (unit) {
+                case 'per kg':
+                    return { step: 0.5, formatQty: (q) => `${q} kg` };
+                case 'per 500g':
+                    return { step: 1, formatQty: (q) => `${q * 500}g (${q} × 500g)` };
+                case 'per 250g':
+                    return { step: 1, formatQty: (q) => `${q * 250}g (${q} × 250g)` };
+                case 'per g':
+                    return { step: 100, formatQty: (q) => `${q}g` };
+                case 'per bunch':
+                    return { step: 1, formatQty: (q) => `${q} ${q === 1 ? 'bunch' : 'bunches'}` };
+                case 'per piece':
+                default:
+                    return { step: 1, formatQty: (q) => `${q} ${q === 1 ? 'piece' : 'pieces'}` };
+            }
+        }
+
+        // Calculate line item subtotal cleanly
+        function calculateItemSubtotal(product, qty) {
+            if (!qty || qty <= 0) return 0;
+            if (product.unit === 'per g') {
+                // Price is per 100g when 'per g' is chosen, or direct multiplier if price is per gram
+                // To keep Rs pricing intuitive in Mauritius, 'per g' treats price as per 100g
+                return Math.round((product.price * (qty / 100)) * 100) / 100;
+            }
+            return Math.round((product.price * qty) * 100) / 100;
+        }
+
+        // 4. RENDER VEGETABLE CARDS (CUSTOMER & OWNER VIEWS)
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            const emptyState = document.getElementById('empty-state');
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+
+            const filtered = state.products.filter(p => p.name.toLowerCase().includes(query));
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            grid.innerHTML = filtered.map(product => {
+                const qty = state.basket[product.id] || 0;
+                const unitCfg = getUnitConfig(product.unit);
+                const isSelected = qty > 0 && product.inStock;
+
+                // OWNER EDIT CARD VIEW
+                if (state.isOwner) {
+                    return `
+                    <div class="bg-white rounded-3xl p-5 border-2 ${product.inStock ? 'border-farm-600' : 'border-red-300 bg-red-50/40'} shadow-md flex flex-col justify-between gap-4">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="flex items-center gap-3">
+                                <span class="text-4xl bg-cream-100 w-14 h-14 rounded-2xl flex items-center justify-center border border-cream-200 shrink-0">${product.emoji}</span>
+                                <div>
+                                    <input type="text" value="${escapeHtml(product.name)}" 
+                                        onchange="updateProductField('${product.id}', 'name', this.value)"
+                                        class="font-bold text-lg text-gray-900 bg-cream-50 border border-gray-300 rounded-xl px-2.5 py-1 w-full focus:border-farm-600">
+                                    <span class="inline-block mt-1 text-xs font-bold uppercase px-2.5 py-0.5 rounded-full ${product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                        ${product.inStock ? '● In Stock' : '● Sold Out'}
+                                    </span>
+                                </div>
+                            </div>
+                            <button onclick="deleteProduct('${product.id}')" title="Delete Vegetable" class="text-red-500 hover:bg-red-100 p-2 rounded-xl transition cursor-pointer">
+                                🗑️
+                            </button>
+                        </div>
+
+                        <!-- Daily Price & Unit Controls -->
+                        <div class="grid grid-cols-2 gap-3 bg-cream-50 p-3 rounded-2xl border border-cream-200">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Today's Price (Rs)</label>
+                                <input type="number" step="0.5" min="0" value="${product.price}" 
+                                    onchange="updateProductField('${product.id}', 'price', parseFloat(this.value) || 0)"
+                                    class="w-full bg-white border-2 border-farm-600 rounded-xl px-3 py-2 text-xl font-extrabold text-farm-900">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Unit</label>
+                                <select onchange="updateProductField('${product.id}', 'unit', this.value)"
+                                    class="w-full bg-white border-2 border-gray-300 rounded-xl px-2.5 py-2.5 text-sm font-bold text-gray-900">
+                                    <option value="per kg" ${product.unit === 'per kg' ? 'selected' : ''}>per kg</option>
+                                    <option value="per 500g" ${product.unit === 'per 500g' ? 'selected' : ''}>per 500g</option>
+                                    <option value="per 250g" ${product.unit === 'per 250g' ? 'selected' : ''}>per 250g</option>
+                                    <option value="per g" ${product.unit === 'per g' ? 'selected' : ''}>per g (100g)</option>
+                                    <option value="per bunch" ${product.unit === 'per bunch' ? 'selected' : ''}>per bunch</option>
+                                    <option value="per piece" ${product.unit === 'per piece' ? 'selected' : ''}>per piece</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Toggle Stock Button -->
+                        <button onclick="toggleProductStock('${product.id}')" 
+                            class="w-full py-3 rounded-2xl font-bold text-base transition cursor-pointer ${product.inStock ? 'bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300' : 'bg-farm-700 hover:bg-farm-800 text-white'}">
+                            ${product.inStock ? 'Mark as Sold Out' : '✅ Mark Back In Stock'}
+                        </button>
+                    </div>
+                    `;
+                }
+
+                // CUSTOMER ACCESSIBLE CARD VIEW
+                return `
+                <div class="bg-white rounded-3xl p-5 border-2 transition-all duration-200 flex flex-col justify-between shadow-sm hover:shadow-md ${isSelected ? 'border-farm-600 bg-farm-50/40' : 'border-cream-200'} ${!product.inStock ? 'opacity-65' : ''}">
+                    <!-- Top Row: Large Visual Icon & Name/Price -->
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-cream-100 border border-cream-200 flex items-center justify-center text-4xl sm:text-5xl shrink-0 shadow-inner">
+                            ${product.emoji}
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="text-xl sm:text-2xl font-extrabold text-gray-900 leading-snug">
+                                ${escapeHtml(product.name)}
+                            </h3>
+                            <div class="mt-1.5 flex items-baseline flex-wrap gap-1.5">
+                                <span class="text-2xl sm:text-3xl font-extrabold text-farm-700">
+                                    Rs ${product.price}
+                                </span>
+                                <span class="text-sm sm:text-base font-bold text-gray-600 bg-cream-100 px-2.5 py-0.5 rounded-lg border border-cream-200">
+                                    ${product.unit === 'per g' ? 'per 100g' : product.unit}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Row: Big Easy + / - Buttons -->
+                    <div class="mt-5 pt-4 border-t border-cream-100">
+                        ${!product.inStock ? `
+                            <div class="w-full py-3.5 rounded-2xl bg-gray-200 text-gray-600 font-extrabold text-center text-lg">
+                                Sold Out Today
+                            </div>
+                        ` : qty === 0 ? `
+                            <button onclick="changeQuantity('${product.id}', ${unitCfg.step})" 
+                                class="w-full bg-farm-700 hover:bg-farm-800 active:scale-98 text-white font-extrabold text-lg sm:text-xl py-3.5 rounded-2xl shadow transition flex items-center justify-center gap-2 cursor-pointer">
+                                <span class="text-2xl leading-none">+</span>
+                                <span>Add to Basket</span>
+                            </button>
+                        ` : `
+                            <div class="flex items-center justify-between gap-2 bg-white border-2 border-farm-600 rounded-2xl p-1.5 shadow-inner">
+                                <button onclick="changeQuantity('${product.id}', -${unitCfg.step})" aria-label="Decrease quantity"
+                                    class="w-14 h-12 sm:w-16 sm:h-14 rounded-xl bg-red-100 hover:bg-red-200 active:scale-95 text-red-800 font-extrabold text-2xl flex items-center justify-center transition cursor-pointer">
+                                    −
+                                </button>
+                                <div class="text-center px-2">
+                                    <div class="text-lg sm:text-xl font-extrabold text-farm-900 leading-tight">
+                                        ${unitCfg.formatQty(qty)}
+                                    </div>
+                                    <div class="text-xs sm:text-sm font-bold text-farm-700">
+                                        Rs ${calculateItemSubtotal(product, qty)}
+                                    </div>
+                                </div>
+                                <button onclick="changeQuantity('${product.id}', ${unitCfg.step})" aria-label="Increase quantity"
+                                    class="w-14 h-12 sm:w-16 sm:h-14 rounded-xl bg-farm-700 hover:bg-farm-800 active:scale-95 text-white font-extrabold text-2xl flex items-center justify-center transition cursor-pointer">
+                                    +
+                                </button>
+                            </div>
+                        `}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // 5. BASKET MANAGEMENT (CUSTOMER)
+        function changeQuantity(productId, delta) {
+            const current = state.basket[productId] || 0;
+            const next = Math.round((current + delta) * 100) / 100;
+
+            if (next <= 0) {
+                delete state.basket[productId];
+            } else {
+                state.basket[productId] = next;
+            }
+
+            saveBasketToStorage();
+            renderProducts();
+            updateBasketUI();
+        }
+
+        function clearBasket() {
+            state.basket = {};
+            saveBasketToStorage();
+            renderProducts();
+            updateBasketUI();
+            closeModal('checkout-modal');
+            showToast('Basket cleared', '🧺');
+        }
+
+        function updateBasketUI() {
+            let totalItems = 0;
+            let totalAmount = 0;
+
+            Object.entries(state.basket).forEach(([id, qty]) => {
+                const product = state.products.find(p => p.id === id);
+                if (product && product.inStock && qty > 0) {
+                    totalItems += 1;
+                    totalAmount += calculateItemSubtotal(product, qty);
+                }
+            });
+
+            document.getElementById('basket-count-badge').textContent = totalItems;
+            document.getElementById('basket-total-amount').textContent = totalAmount;
+        }
+
+        // 6. WHATSAPP CHECKOUT FLOW
+        function handleOrderTypeChange() {
+            const orderTypeEl = document.querySelector('input[name="order-type"]:checked');
+            const isDelivery = orderTypeEl && orderTypeEl.value === 'Home Delivery';
+            const noteLabel = document.getElementById('customer-note-label');
+            const noteInput = document.getElementById('customer-note');
+
+            if (isDelivery) {
+                noteLabel.innerHTML = `Delivery Address <span class="text-amber-700 font-bold">(Required for Delivery)</span>`;
+                noteInput.placeholder = 'Enter your full delivery address & landmark...';
+            } else {
+                noteLabel.innerHTML = `Pickup Time or Note <span class="text-gray-500 font-normal">(Optional)</span>`;
+                noteInput.placeholder = `e.g. Pickup at 4pm at ${state.settings.storeAddress}...`;
+            }
+
+            recalculateCheckoutTotals();
+        }
+
+        function recalculateCheckoutTotals() {
+            let subtotal = 0;
+            Object.entries(state.basket).forEach(([id, qty]) => {
+                const product = state.products.find(p => p.id === id);
+                if (product && product.inStock && qty > 0) {
+                    subtotal += calculateItemSubtotal(product, qty);
+                }
+            });
+
+            const orderTypeEl = document.querySelector('input[name="order-type"]:checked');
+            const isDelivery = orderTypeEl && orderTypeEl.value === 'Home Delivery';
+            const deliveryRow = document.getElementById('checkout-delivery-row');
+            const deliveryFeeDisplay = document.getElementById('checkout-delivery-fee-display');
+            const configuredFee = Number(state.settings.deliveryFee) || 0;
+
+            let grandTotal = subtotal;
+
+            if (isDelivery) {
+                deliveryRow.classList.remove('hidden');
+                if (configuredFee > 0) {
+                    deliveryFeeDisplay.textContent = `Rs ${configuredFee}`;
+                    grandTotal += configuredFee;
+                } else {
+                    deliveryFeeDisplay.textContent = 'Applies (Confirmed on WhatsApp)';
+                }
+            } else {
+                deliveryRow.classList.add('hidden');
+            }
+
+            document.getElementById('checkout-subtotal').textContent = subtotal;
+            document.getElementById('checkout-total').textContent = grandTotal;
+        }
+
+        function openCheckoutModal() {
+            const listEl = document.getElementById('checkout-items-list');
+            const selectedEntries = [];
+
+            Object.entries(state.basket).forEach(([id, qty]) => {
+                const product = state.products.find(p => p.id === id);
+                if (product && product.inStock && qty > 0) {
+                    const sub = calculateItemSubtotal(product, qty);
+                    selectedEntries.push({ product, qty, sub });
+                }
+            });
+
+            if (selectedEntries.length === 0) {
+                showToast('Please tap "+ Add to Basket" on a vegetable first!', '🥕');
+                return;
+            }
+
+            listEl.innerHTML = selectedEntries.map(({ product, qty, sub }) => {
+                const unitCfg = getUnitConfig(product.unit);
+                return `
+                <div class="bg-white border border-gray-200 rounded-2xl p-3.5 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">${product.emoji}</span>
+                        <div>
+                            <div class="font-bold text-gray-900 text-base">${escapeHtml(product.name)}</div>
+                            <div class="text-sm text-gray-600 font-medium">${unitCfg.formatQty(qty)} @ Rs ${product.price}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold text-farm-800 text-base mr-1">Rs ${sub}</span>
+                        <button onclick="changeQuantity('${product.id}', -${unitCfg.step}); openCheckoutModal();" class="w-8 h-8 rounded-lg bg-red-100 text-red-700 font-bold cursor-pointer">−</button>
+                        <button onclick="changeQuantity('${product.id}', ${unitCfg.step}); openCheckoutModal();" class="w-8 h-8 rounded-lg bg-farm-100 text-farm-800 font-bold cursor-pointer">+</button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            handleOrderTypeChange();
+            document.getElementById('checkout-modal').classList.remove('hidden');
+        }
+
+        function sendWhatsAppOrder() {
+            const customerName = document.getElementById('customer-name').value.trim();
+            const orderType = document.querySelector('input[name="order-type"]:checked').value;
+            const isDelivery = orderType === 'Home Delivery';
+            const customerNote = document.getElementById('customer-note').value.trim();
+
+            if (isDelivery && !customerNote) {
+                showToast('Please enter your delivery address below!', '📍');
+                document.getElementById('customer-note').focus();
+                return;
+            }
+
+            let subtotal = 0;
+            const lines = [];
+
+            Object.entries(state.basket).forEach(([id, qty]) => {
+                const product = state.products.find(p => p.id === id);
+                if (product && product.inStock && qty > 0) {
+                    const sub = calculateItemSubtotal(product, qty);
+                    const unitCfg = getUnitConfig(product.unit);
+                    subtotal += sub;
+                    lines.push(`• ${product.name}: ${unitCfg.formatQty(qty)} — Rs ${sub}`);
+                }
+            });
+
+            if (lines.length === 0) {
+                showToast('Your basket is empty!', '🧺');
+                return;
+            }
+
+            const configuredFee = Number(state.settings.deliveryFee) || 0;
+            const grandTotal = isDelivery && configuredFee > 0 ? subtotal + configuredFee : subtotal;
+
+            // Build clean, easy-to-read WhatsApp message
+            let message = `🌿 *NEW ORDER — SWAYKE FRESH MARKET* 🌿\n`;
+            message += `📍 *Store:* ${state.settings.storeAddress}\n\n`;
+            if (customerName) message += `👤 *Customer:* ${customerName}\n`;
+            message += `📦 *Order Type:* ${isDelivery ? 'Home Delivery (Delivery fee applies)' : `Store Pickup (${state.settings.storeAddress})`}\n`;
+            if (customerNote) {
+                message += `${isDelivery ? '🏠 *Delivery Address:*' : '📝 *Note:*'} ${customerNote}\n`;
+            }
+            message += `\n*Vegetables Ordered:*\n${lines.join('\n')}\n`;
+            message += `\n🧺 *Vegetables Subtotal:* Rs ${subtotal}\n`;
+            if (isDelivery) {
+                message += configuredFee > 0
+                    ? `🚚 *Delivery Fee:* Rs ${configuredFee}\n`
+                    : `🚚 *Delivery Fee:* Applies (to be confirmed)\n`;
+            }
+            message += `💰 *Estimated Total: Rs ${grandTotal}*\n`;
+            message += `\nThank you! Please confirm availability.`;
+
+            // Sanitize phone number (digits only)
+            const cleanPhone = state.settings.whatsappNumber.replace(/\D/g, '');
+            const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // 7. STORE QR CODE GENERATION & DOWNLOAD
+        function buildDirectWhatsAppQrUrl() {
+            const cleanPhone = String(state.settings.whatsappNumber || '23058110852').replace(/\D/g, '');
+            // Clean official WhatsApp link without long encoded parameters so customers trust it immediately
+            return `https://wa.me/${cleanPhone}`;
+        }
+
+        function setQrMode(mode) {
+            currentQrMode = mode;
+            const waBtn = document.getElementById('qr-mode-whatsapp-btn');
+            const webBtn = document.getElementById('qr-mode-web-btn');
+            const urlInput = document.getElementById('qr-url-input');
+            const urlLabel = document.getElementById('qr-url-label');
+            const waTip = document.getElementById('whatsapp-qr-tip');
+            const warningEl = document.getElementById('local-file-warning');
+            const subtitleEl = document.getElementById('qr-modal-subtitle');
+            const badgeEl = document.getElementById('qr-card-badge');
+
+            if (mode === 'whatsapp') {
+                waBtn.className = 'py-2 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition cursor-pointer bg-farm-700 text-white shadow-xs';
+                webBtn.className = 'py-2 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition cursor-pointer text-gray-700 hover:bg-white/70';
+                urlLabel.textContent = 'Direct WhatsApp Order Link (No Website Needed)';
+                urlInput.value = buildDirectWhatsAppQrUrl();
+                waTip.classList.remove('hidden');
+                warningEl.classList.add('hidden');
+                subtitleEl.innerHTML = `Point your phone camera at this QR code to open <strong>WhatsApp</strong> and order directly from <strong>Swayke Fresh Market</strong>!`;
+                badgeEl.textContent = '📲 Scan to Order on WhatsApp';
+            } else {
+                webBtn.className = 'py-2 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition cursor-pointer bg-farm-700 text-white shadow-xs';
+                waBtn.className = 'py-2 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition cursor-pointer text-gray-700 hover:bg-white/70';
+                urlLabel.textContent = 'Store Web Link (Encoded in QR)';
+                urlInput.value = window.location.href;
+                waTip.classList.add('hidden');
+                subtitleEl.innerHTML = `Point your phone camera at this QR code to open the <strong>Swayke Fresh Market</strong> price list & basket!`;
+                badgeEl.textContent = '🛒 Scan to View Prices & Order';
+                if (window.location.protocol === 'file:') {
+                    warningEl.classList.remove('hidden');
+                } else {
+                    warningEl.classList.add('hidden');
+                }
+            }
+
+            regenerateQrCode();
+        }
+
+        function openQrModal() {
+            updateStoreInfoDisplays();
+            document.getElementById('qr-modal').classList.remove('hidden');
+            // Default to Direct WhatsApp QR when opened from local file, or keep user's chosen mode
+            setQrMode(window.location.protocol === 'file:' ? 'whatsapp' : currentQrMode);
+        }
+
+        function regenerateQrCode() {
+            const container = document.getElementById('qrcode');
+            const targetUrl = document.getElementById('qr-url-input').value.trim() || buildDirectWhatsAppQrUrl();
+            container.innerHTML = '';
+
+            qrCodeInstance = new QRCode(container, {
+                text: targetUrl,
+                width: 220,
+                height: 220,
+                colorDark: '#1b4326',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+
+        function copyStoreLink() {
+            const urlInput = document.getElementById('qr-url-input');
+            urlInput.select();
+            urlInput.setSelectionRange(0, 99999);
+            try {
+                document.execCommand('copy');
+                showToast('Store link copied to clipboard!', '📋');
+            } catch (err) {
+                showToast('Could not copy link', '⚠️');
+            }
+        }
+
+        function downloadQrCode() {
+            const qrCanvas = document.querySelector('#qrcode canvas');
+            const qrImg = document.querySelector('#qrcode img');
+
+            const drawPoster = (qrSource) => {
+                const poster = document.createElement('canvas');
+                poster.width = 600;
+                poster.height = 760;
+                const ctx = poster.getContext('2d');
+
+                // Cream background & farm-green border
+                ctx.fillStyle = '#fdfbf7';
+                ctx.fillRect(0, 0, poster.width, poster.height);
+                ctx.strokeStyle = '#2e6f40';
+                ctx.lineWidth = 14;
+                ctx.strokeRect(20, 20, poster.width - 40, poster.height - 40);
+
+                // Header banner
+                ctx.fillStyle = '#1b4326';
+                ctx.fillRect(20, 20, poster.width - 40, 130);
+
+                ctx.fillStyle = '#e5b84b';
+                ctx.font = 'bold 20px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('🌱 FROM FARM TO TABLE', poster.width / 2, 65);
+
+                ctx.fillStyle = '#fdfbf7';
+                ctx.font = 'bold 34px Georgia, serif';
+                ctx.fillText('Swayke Fresh Market', poster.width / 2, 115);
+
+                // Draw QR Code in center
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(140, 185, 320, 320);
+                ctx.drawImage(qrSource, 160, 205, 280, 280);
+
+                // Store Details at Bottom
+                ctx.fillStyle = '#13311b';
+                ctx.font = 'bold 26px sans-serif';
+                ctx.fillText('Scan to Order Fresh Vegetables', poster.width / 2, 560);
+
+                ctx.fillStyle = '#2e6f40';
+                ctx.font = 'bold 28px sans-serif';
+                ctx.fillText(`WhatsApp: ${formatDisplayPhone(state.settings.whatsappNumber)}`, poster.width / 2, 615);
+
+                ctx.fillStyle = '#374151';
+                ctx.font = '600 22px sans-serif';
+                ctx.fillText(`📍 ${state.settings.storeAddress}`, poster.width / 2, 665);
+
+                const link = document.createElement('a');
+                link.href = poster.toDataURL('image/png');
+                link.download = 'Swayke-Fresh-Market-QR-Poster.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast('Printable QR Poster downloaded!', '⬇️');
+            };
+
+            if (qrCanvas) {
+                drawPoster(qrCanvas);
+            } else if (qrImg && qrImg.src) {
+                const img = new Image();
+                img.onload = () => drawPoster(img);
+                img.src = qrImg.src;
+            }
+        }
+
+        // 8. OWNER AUTHENTICATION & DAILY PRICE MANAGEMENT
+        function handleOwnerButtonClick() {
+            if (state.isOwner) {
+                logoutOwner();
+            } else {
+                document.getElementById('owner-pin-input').value = '';
+                document.getElementById('login-error').classList.add('hidden');
+                document.getElementById('login-modal').classList.remove('hidden');
+                setTimeout(() => document.getElementById('owner-pin-input').focus(), 100);
+            }
+        }
+
+        function verifyOwnerPin(event) {
+            event.preventDefault();
+            const entered = document.getElementById('owner-pin-input').value.trim();
+
+            if (entered === state.settings.ownerPin) {
+                state.isOwner = true;
+                closeModal('login-modal');
+                updateOwnerUI();
+                renderProducts();
+                showToast('Owner Mode Unlocked! You can now update prices.', '🔓');
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function logoutOwner() {
+            state.isOwner = false;
+            updateOwnerUI();
+            renderProducts();
+            updateBasketUI();
+            showToast('Returned to Customer Storefront View', '🔒');
+        }
+
+        function updateOwnerUI() {
+            const banner = document.getElementById('owner-banner');
+            const addPanel = document.getElementById('owner-add-panel');
+            const customerGuide = document.getElementById('customer-guide');
+            const basketBar = document.getElementById('sticky-basket-bar');
+            const btnIcon = document.getElementById('owner-btn-icon');
+            const btnText = document.getElementById('owner-btn-text');
+
+            if (state.isOwner) {
+                banner.classList.remove('hidden');
+                addPanel.classList.remove('hidden');
+                customerGuide.classList.add('hidden');
+                basketBar.classList.add('hidden');
+                btnIcon.textContent = '🔓';
+                btnText.textContent = 'Exit Owner';
+            } else {
+                banner.classList.add('hidden');
+                addPanel.classList.add('hidden');
+                customerGuide.classList.remove('hidden');
+                basketBar.classList.remove('hidden');
+                btnIcon.textContent = '🔒';
+                btnText.textContent = 'Owner';
+            }
+        }
+
+        // Owner CRUD Operations
+        function updateProductField(id, field, value) {
+            if (!state.isOwner) return;
+            const product = state.products.find(p => p.id === id);
+            if (!product) return;
+
+            product[field] = value;
+            saveProductsToStorage();
+            updateBasketUI();
+            showToast(`Updated ${product.name}`, '✅');
+        }
+
+        function toggleProductStock(id) {
+            if (!state.isOwner) return;
+            const product = state.products.find(p => p.id === id);
+            if (!product) return;
+
+            product.inStock = !product.inStock;
+            saveProductsToStorage();
+            renderProducts();
+            updateBasketUI();
+            showToast(`${product.name} marked ${product.inStock ? 'In Stock' : 'Sold Out'}`, product.inStock ? '✅' : '⚠️');
+        }
+
+        function deleteProduct(id) {
+            if (!state.isOwner) return;
+            const idx = state.products.findIndex(p => p.id === id);
+            if (idx === -1) return;
+
+            const removedName = state.products[idx].name;
+            state.products.splice(idx, 1);
+            delete state.basket[id];
+
+            saveProductsToStorage();
+            saveBasketToStorage();
+            renderProducts();
+            updateBasketUI();
+            showToast(`Removed ${removedName}`, '🗑️');
+        }
+
+        function handleAddNewItem(event) {
+            event.preventDefault();
+            if (!state.isOwner) return;
+
+            const emoji = document.getElementById('new-emoji').value.trim() || '🥬';
+            const name = document.getElementById('new-name').value.trim();
+            const price = parseFloat(document.getElementById('new-price').value);
+            const unit = document.getElementById('new-unit').value;
+
+            if (!name || isNaN(price)) return;
+
+            const newProduct = {
+                id: 'veg-' + Date.now(),
+                name,
+                price,
+                unit,
+                emoji,
+                inStock: true
+            };
+
+            state.products.unshift(newProduct);
+            saveProductsToStorage();
+            renderProducts();
+
+            document.getElementById('new-name').value = '';
+            document.getElementById('new-price').value = '';
+            showToast(`Added ${name} (Rs ${price} ${unit})`, '🌱');
+        }
+
+        // Store Settings Modal
+        function openSettingsModal() {
+            if (!state.isOwner) return;
+            document.getElementById('setting-whatsapp').value = state.settings.whatsappNumber;
+            document.getElementById('setting-address').value = state.settings.storeAddress || 'School Lane, Midlands';
+            document.getElementById('setting-delivery-fee').value = state.settings.deliveryFee ?? 50;
+            document.getElementById('setting-pin').value = state.settings.ownerPin;
+            document.getElementById('setting-csv-url').value = state.settings.googleSheetCsvUrl || '';
+            document.getElementById('settings-modal').classList.remove('hidden');
+        }
+
+        async function saveStoreSettings(event) {
+            event.preventDefault();
+            if (!state.isOwner) return;
+
+            state.settings.whatsappNumber = document.getElementById('setting-whatsapp').value.trim();
+            state.settings.storeAddress = document.getElementById('setting-address').value.trim() || 'School Lane, Midlands';
+            state.settings.deliveryFee = Math.max(0, parseFloat(document.getElementById('setting-delivery-fee').value) || 0);
+            state.settings.ownerPin = document.getElementById('setting-pin').value.trim();
+            state.settings.googleSheetCsvUrl = document.getElementById('setting-csv-url').value.trim();
+
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(state.settings));
+            updateStoreInfoDisplays();
+
+            if (state.settings.googleSheetCsvUrl) {
+                await fetchProductsFromGoogleSheet(state.settings.googleSheetCsvUrl);
+                renderProducts();
+            }
+
+            closeModal('settings-modal');
+            showToast('Store settings saved!', '⚙️');
+        }
+
+        function resetDefaultCatalog() {
+            if (!state.isOwner) return;
+            state.products = [...DEFAULT_PRODUCTS];
+            saveProductsToStorage();
+            renderProducts();
+            closeModal('settings-modal');
+            showToast('Restored default Mauritian vegetable list', '🔄');
+        }
+
+        // One-tap share today's formatted vegetable price list to WhatsApp Status or Customers
+        function sharePriceListWhatsApp() {
+            if (!state.isOwner) return;
+            const today = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+            const available = state.products.filter(p => p.inStock);
+
+            if (available.length === 0) {
+                showToast('No in-stock vegetables to share!', '⚠️');
+                return;
+            }
+
+            let msg = `🌿 *SWAYKE FRESH MARKET — TODAY'S PRICES (${today})* 🌿\n`;
+            msg += `📍 *Location:* ${state.settings.storeAddress}\n\n`;
+            available.forEach(p => {
+                const displayUnit = p.unit === 'per g' ? 'per 100g' : p.unit;
+                msg += `${p.emoji} *${p.name}* — Rs ${p.price} (${displayUnit})\n`;
+            });
+            msg += `\n🚚 *Pickup Free* at ${state.settings.storeAddress} or *Home Delivery* (delivery fee applies).\n`;
+            msg += `📲 *Reply here or WhatsApp us on:* ${formatDisplayPhone(state.settings.whatsappNumber)}`;
+
+            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        // Generate a clean, trustworthy Price List Image Poster (PNG) for WhatsApp Status / Groups
+        function downloadPriceListPoster() {
+            if (!state.isOwner) return;
+            const available = state.products.filter(p => p.inStock);
+            if (available.length === 0) {
+                showToast('No in-stock vegetables to include!', '⚠️');
+                return;
+            }
+
+            const today = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+            const rowHeight = 56;
+            const headerHeight = 175;
+            const footerHeight = 165;
+            const canvasWidth = 760;
+            const canvasHeight = headerHeight + (available.length * rowHeight) + footerHeight;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            const ctx = canvas.getContext('2d');
+
+            // Cream background & green border
+            ctx.fillStyle = '#fdfbf7';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            ctx.strokeStyle = '#2e6f40';
+            ctx.lineWidth = 14;
+            ctx.strokeRect(18, 18, canvasWidth - 36, canvasHeight - 36);
+
+            // Header Block
+            ctx.fillStyle = '#1b4326';
+            ctx.fillRect(18, 18, canvasWidth - 36, headerHeight - 25);
+
+            ctx.fillStyle = '#e5b84b';
+            ctx.font = 'bold 20px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`🌱 FRESH HARVEST PRICE LIST • ${today.toUpperCase()}`, canvasWidth / 2, 62);
+
+            ctx.fillStyle = '#fdfbf7';
+            ctx.font = 'bold 38px Georgia, serif';
+            ctx.fillText('Swayke Fresh Market', canvasWidth / 2, 112);
+
+            ctx.fillStyle = '#e4f1e5';
+            ctx.font = '600 20px sans-serif';
+            ctx.fillText(`📍 ${state.settings.storeAddress}   •   WhatsApp: ${formatDisplayPhone(state.settings.whatsappNumber)}`, canvasWidth / 2, 148);
+
+            // Vegetable Price Rows
+            let y = headerHeight + 25;
+            available.forEach((item, idx) => {
+                if (idx % 2 === 0) {
+                    ctx.fillStyle = '#f4f9f4';
+                    ctx.fillRect(42, y - 34, canvasWidth - 84, rowHeight - 6);
+                }
+
+                // Name + Emoji on Left
+                ctx.textAlign = 'left';
+                ctx.fillStyle = '#13311b';
+                ctx.font = 'bold 24px sans-serif';
+                ctx.fillText(`${item.emoji}  ${item.name}`, 58, y);
+
+                // Price + Unit on Right
+                const displayUnit = item.unit === 'per g' ? 'per 100g' : item.unit;
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#235631';
+                ctx.font = 'bold 25px sans-serif';
+                ctx.fillText(`Rs ${item.price} (${displayUnit})`, canvasWidth - 58, y);
+
+                y += rowHeight;
+            });
+
+            // Footer Callout Box
+            const footerY = canvasHeight - footerHeight + 12;
+            ctx.fillStyle = '#f8f3e8';
+            ctx.fillRect(42, footerY, canvasWidth - 84, 115);
+            ctx.strokeStyle = '#d4a024';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(42, footerY, canvasWidth - 84, 115);
+
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#1b4326';
+            ctx.font = 'bold 25px sans-serif';
+            ctx.fillText(`📲 Order via WhatsApp: ${formatDisplayPhone(state.settings.whatsappNumber)}`, canvasWidth / 2, footerY + 46);
+
+            ctx.fillStyle = '#374151';
+            ctx.font = '600 20px sans-serif';
+            ctx.fillText(`🏪 Free Pickup at ${state.settings.storeAddress}  |  🚚 Delivery Available (Fee Applies)`, canvasWidth / 2, footerY + 86);
+
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = `Swayke-Fresh-Market-Prices-${today.replace(/\s+/g, '-')}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Price List Poster image saved! Share it on WhatsApp.', '🖼️');
+        }
+
+        // Download a ready-to-upload index.html file with the latest prices & settings baked in
+        function downloadUpdatedHtmlFile() {
+            if (!state.isOwner) return;
+            const rawHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            const updatedProductsCode = `const DEFAULT_PRODUCTS = ${JSON.stringify(state.products, null, 12)};`;
+            const updatedHtml = rawHtml.replace(/const DEFAULT_PRODUCTS = \[[\s\S]*?\];/, updatedProductsCode);
+
+            const blob = new Blob([updatedHtml], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'index.html';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showToast('Downloaded index.html ready for GitHub!', '💾');
+        }
+
+        // 9. UI HELPERS (MODALS, TOAST, XSS ESCAPING)
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        let toastTimeout = null;
+        function showToast(message, icon = '✅') {
+            const container = document.getElementById('toast-container');
+            document.getElementById('toast-message').textContent = message;
+            document.getElementById('toast-icon').textContent = icon;
+
+            container.classList.remove('opacity-0', '-translate-y-4');
+            container.classList.add('opacity-100', 'translate-y-0');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                container.classList.remove('opacity-100', 'translate-y-0');
+                container.classList.add('opacity-0', '-translate-y-4');
+            }, 3000);
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
